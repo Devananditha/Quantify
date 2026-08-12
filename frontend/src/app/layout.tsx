@@ -61,7 +61,7 @@ export default function RootLayout({
         <div className={styles.shell}>
           <Sidebar />
           <main 
-            className="min-h-screen flex-1 pt-20 pb-24 px-4 sm:pt-8 sm:pb-8 sm:px-6 lg:pl-[100px] lg:pr-[100px] overflow-x-hidden flex justify-center"
+            className="min-h-screen flex-1 py-8 pr-8 pl-[100px] lg:pr-[100px] max-sm:py-4 max-sm:px-4 max-sm:pb-24 overflow-x-hidden flex justify-center"
             style={{
               backgroundColor: "#f0fbff",
               backgroundImage: "radial-gradient(circle at 0% 0%, rgba(132, 230, 248, 0.4) 0%, transparent 40%), radial-gradient(circle at 80% 10%, rgba(132, 230, 248, 0.3) 0%, transparent 40%), radial-gradient(circle at 100% 60%, rgba(132, 230, 248, 0.4) 0%, transparent 50%), radial-gradient(#94a3b8 1px, transparent 1px)",

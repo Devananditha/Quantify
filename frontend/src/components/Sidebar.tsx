@@ -58,7 +58,7 @@ export function Sidebar() {
     <>
       {/* ── MOBILE: Bottom Nav Bar ─────────────────────────────── */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-white/80 backdrop-blur-xl border-t border-cyan-100 shadow-[0_-4px_24px_rgba(14,165,233,0.12)] sm:hidden"
+        className="fixed bottom-0 left-0 right-0 z-50 hidden max-sm:flex items-center justify-around bg-white/80 backdrop-blur-xl border-t border-cyan-100 shadow-[0_-4px_24px_rgba(14,165,233,0.12)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {NAV_ITEMS.map((item) => {
@@ -73,18 +73,15 @@ export function Sidebar() {
             >
               <span className={`transition-transform ${isActive ? "scale-110" : ""}`}>{item.icon}</span>
               <span className="text-[9px] font-bold uppercase tracking-wider leading-none">{item.label}</span>
-              {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#0284C7] rounded-full" />
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* ── DESKTOP: Hamburger Button ──────────────────────────── */}
+      {/* ── Hamburger Menu Button (always visible, same as original) ── */}
       <button
         onClick={() => setIsOpen(true)}
-        className="hidden sm:flex fixed top-8 left-8 z-40 p-2.5 bg-white/60 backdrop-blur-xl rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.15)] border border-white/80 text-[#08172c] hover:bg-white hover:shadow-[0_4px_20px_rgba(14,165,233,0.25)] transition-all items-center justify-center"
+        className="fixed top-8 left-8 z-40 p-2.5 bg-white/60 backdrop-blur-xl rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.15)] border border-white/80 text-[#08172c] hover:bg-white hover:shadow-[0_4px_20px_rgba(14,165,233,0.25)] transition-all"
         aria-label="Open menu"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
