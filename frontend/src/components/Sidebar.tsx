@@ -56,10 +56,35 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Hamburger Menu Button */}
-      <button 
+      {/* ── MOBILE: Bottom Nav Bar ─────────────────────────────── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-white/80 backdrop-blur-xl border-t border-cyan-100 shadow-[0_-4px_24px_rgba(14,165,233,0.12)] sm:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        {NAV_ITEMS.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center gap-1 py-2 px-4 min-w-[60px] transition-all ${
+                isActive ? "text-[#0284C7]" : "text-slate-400"
+              }`}
+            >
+              <span className={`transition-transform ${isActive ? "scale-110" : ""}`}>{item.icon}</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider leading-none">{item.label}</span>
+              {isActive && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#0284C7] rounded-full" />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* ── DESKTOP: Hamburger Button ──────────────────────────── */}
+      <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-8 left-8 z-40 p-2.5 bg-white/60 backdrop-blur-xl rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.15)] border border-white/80 text-[#08172c] hover:bg-white hover:shadow-[0_4px_20px_rgba(14,165,233,0.25)] transition-all"
+        className="hidden sm:flex fixed top-8 left-8 z-40 p-2.5 bg-white/60 backdrop-blur-xl rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.15)] border border-white/80 text-[#08172c] hover:bg-white hover:shadow-[0_4px_20px_rgba(14,165,233,0.25)] transition-all items-center justify-center"
         aria-label="Open menu"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -71,19 +96,19 @@ export function Sidebar() {
 
       {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-[#08172c]/30 backdrop-blur-[2px] z-40 transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside 
-        className={`fixed top-0 left-0 h-[100dvh] w-[260px] shrink-0 flex flex-col py-6 overflow-hidden bg-gradient-to-b from-[#e0f7fa]/90 via-[#bae6fd]/80 to-[#38bdf8]/80 backdrop-blur-3xl border-r border-white/50 text-[#08172c] shadow-[4px_0_32px_rgba(14,165,233,0.35)] z-50 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`} 
+      {/* ── DESKTOP: Sidebar Drawer ────────────────────────────── */}
+      <aside
+        className={`fixed top-0 left-0 h-[100dvh] w-[260px] shrink-0 flex flex-col py-6 overflow-hidden bg-gradient-to-b from-[#e0f7fa]/90 via-[#bae6fd]/80 to-[#38bdf8]/80 backdrop-blur-3xl border-r border-white/50 text-[#08172c] shadow-[4px_0_32px_rgba(14,165,233,0.35)] z-50 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ boxShadow: '4px 0 32px rgba(14,165,233,0.2), inset -1px 0 0 rgba(255,255,255,0.4)' }}
       >
         {/* Close Button inside Sidebar */}
-        <button 
+        <button
           onClick={() => setIsOpen(false)}
           className="absolute top-6 right-4 p-2 rounded-lg text-[#08172c]/60 hover:text-[#08172c] hover:bg-white/30 transition-all"
           aria-label="Close menu"
@@ -115,6 +140,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setIsOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all relative ${
                 isActive
                   ? "bg-white/40 shadow-sm rounded-r-xl"

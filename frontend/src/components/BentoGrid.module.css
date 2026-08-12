@@ -18,8 +18,15 @@
   }
 }
 
+/* Tablet — 2 col grid; each card spans full width */
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  /* Force all cards to full width (1 column) except explicit 2-col pairs */
+  .grid > * {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
   }
 }

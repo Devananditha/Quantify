@@ -17,7 +17,7 @@
 }
 
 .title {
-  font-size: var(--text-2xl);
+  font-size: clamp(1.4rem, 5vw, var(--text-2xl));
   font-weight: var(--font-bold);
   letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
