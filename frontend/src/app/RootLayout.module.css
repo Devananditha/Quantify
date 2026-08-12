@@ -1,0 +1,27 @@
+/* Root shell — sidebar + main content */
+.shell {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--color-bg-base);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-6);
+  /* Subtle dot-grid overlay on the obsidian background */
+  background-image:
+    radial-gradient(circle, rgba(186, 249, 26, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: local;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    flex-direction: column;
+  }
+  .main {
+    padding: var(--space-4);
+  }
+}

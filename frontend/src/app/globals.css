@@ -1,0 +1,461 @@
+/* ==========================================================================
+   DASH — Global Design System
+   Icy Cyan Glassmorphism
+   ========================================================================== */
+
+@import "tailwindcss";
+
+
+/* --------------------------------------------------------------------------
+   1. DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  /* --- Core Palette: Icy Cyan Glassmorphism --- */
+  --color-bg-base:       #EBF8FA;
+  --color-bg-elevated:   rgba(255, 255, 255, 0.4);
+  --color-bg-surface:    rgba(255, 255, 255, 0.6);
+  --color-bg-overlay:    rgba(255, 255, 255, 0.8);
+  --color-border:        rgba(150, 220, 240, 0.4);
+  --color-border-focus:  rgba(0, 150, 200, 0.3);
+
+  /* Brand — Sky Blue */
+  --color-brand-400:     #0EA5E9;
+  --color-brand-500:     #0284C7;
+  --color-brand-600:     #0369A1;
+  --color-brand-glow:    rgba(14, 165, 233, 0.2);
+  --color-brand-soft:    #E0F2FE;
+
+  /* Accent — Cyan */
+  --color-accent-400:    #06B6D4;
+  --color-accent-500:    #0891B2;
+  --color-accent-glow:   rgba(6, 182, 212, 0.15);
+
+  /* Semantic (Status Badges) */
+  --color-success:       #ffffff;
+  --color-success-bg:    #1D735B;
+  --color-warning:       #ffffff;
+  --color-warning-bg:    #D4AC6E;
+  --color-danger:        #ffffff;
+  --color-danger-bg:     #B47A6B;
+  --color-pending:       #ffffff;
+  --color-pending-bg:    #D4AC6E;
+
+  /* Text */
+  --color-text-primary:   #0F1E36;
+  --color-text-secondary: #64748B;
+  --color-text-tertiary:  #94A3B8;
+  --color-text-inverse:   #ffffff;
+
+  /* --- Typography --- */
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --font-digital: var(--font-doto), var(--font-mono), monospace;
+
+  /* Type Scale */
+  --text-xs:    0.64rem;
+  --text-sm:    0.8rem;
+  --text-base:  1rem;
+  --text-md:    1.25rem;
+  --text-lg:    1.563rem;
+  --text-xl:    1.953rem;
+  --text-2xl:   2.441rem;
+  --text-3xl:   3.052rem;
+
+  /* Font Weights */
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* Line Heights */
+  --leading-tight:  1.2;
+  --leading-snug:   1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed:1.625;
+
+  /* Letter Spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.06em;
+  --tracking-widest:  0.12em;
+
+  /* --- Spacing (4px baseline grid) --- */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-9:   36px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-14:  56px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-32: 128px;
+
+  /* --- Border Radius --- */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* --- Glassmorphism Shadows --- */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md:   0 4px 20px rgba(0,0,0,0.6);
+  --shadow-lg:   0 8px 40px rgba(0,0,0,0.7);
+  --shadow-glow-brand: 0 0 24px rgba(186, 249, 26, 0.2);
+  --shadow-glow-accent: 0 0 20px rgba(77, 255, 210, 0.15);
+  --shadow-inner: inset 0 1px 0 rgba(186, 249, 26, 0.06);
+
+  /* --- Transitions --- */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   120ms;
+  --duration-normal: 220ms;
+  --duration-slow:   400ms;
+
+  /* --- Bento Grid --- */
+  --bento-gap:     var(--space-4);
+  --bento-cols:    12;
+  --bento-radius:  var(--radius-xl);
+}
+
+/* --------------------------------------------------------------------------
+   2. RESET
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  line-height: var(--leading-normal);
+  min-height: 100dvh;
+  /* Icy Cyan Dotted Grid Overlay */
+  background-color: var(--color-bg-base);
+  background-image: radial-gradient(rgba(150, 220, 240, 0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. TYPOGRAPHY UTILITIES
+   -------------------------------------------------------------------------- */
+.text-xs       { font-size: var(--text-xs); }
+.text-sm       { font-size: var(--text-sm); }
+.text-base     { font-size: var(--text-base); }
+.text-md       { font-size: var(--text-md); }
+.text-lg       { font-size: var(--text-lg); }
+.text-xl       { font-size: var(--text-xl); }
+.text-2xl      { font-size: var(--text-2xl); }
+.text-3xl      { font-size: var(--text-3xl); }
+
+.font-normal   { font-weight: var(--font-normal); }
+.font-medium   { font-weight: var(--font-medium); }
+.font-semibold { font-weight: var(--font-semibold); }
+.font-bold     { font-weight: var(--font-bold); }
+.font-mono     { font-family: var(--font-mono); }
+.font-digital  { 
+  font-family: var(--font-digital); 
+  font-variation-settings: "ROND" 100, "wght" 500; 
+  letter-spacing: 0.1em;
+}
+
+.text-primary   { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary  { color: var(--color-text-tertiary); }
+.text-brand     { color: var(--color-brand-400); }
+.text-accent    { color: var(--color-accent-400); }
+.text-success   { color: var(--color-success); }
+.text-warning   { color: var(--color-warning); }
+.text-danger    { color: var(--color-danger); }
+
+.tracking-tight   { letter-spacing: var(--tracking-tight); }
+.tracking-wide    { letter-spacing: var(--tracking-wide); }
+.tracking-widest  { letter-spacing: var(--tracking-widest); }
+
+.uppercase  { text-transform: uppercase; }
+.truncate   { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   4. SPACING UTILITIES
+   -------------------------------------------------------------------------- */
+.p-1  { padding: var(--space-1); }
+.p-2  { padding: var(--space-2); }
+.p-3  { padding: var(--space-3); }
+.p-4  { padding: var(--space-4); }
+.p-5  { padding: var(--space-5); }
+.p-6  { padding: var(--space-6); }
+.p-8  { padding: var(--space-8); }
+.p-10 { padding: var(--space-10); }
+
+.px-3 { padding-inline: var(--space-3); }
+.px-4 { padding-inline: var(--space-4); }
+.px-5 { padding-inline: var(--space-5); }
+.px-6 { padding-inline: var(--space-6); }
+.py-2 { padding-block: var(--space-2); }
+.py-3 { padding-block: var(--space-3); }
+.py-4 { padding-block: var(--space-4); }
+.py-5 { padding-block: var(--space-5); }
+.py-6 { padding-block: var(--space-6); }
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+.gap-6 { gap: var(--space-6); }
+
+.mb-1  { margin-bottom: var(--space-1); }
+.mb-2  { margin-bottom: var(--space-2); }
+.mb-3  { margin-bottom: var(--space-3); }
+.mb-4  { margin-bottom: var(--space-4); }
+.mb-6  { margin-bottom: var(--space-6); }
+.mb-8  { margin-bottom: var(--space-8); }
+
+/* --------------------------------------------------------------------------
+   5. LAYOUT UTILITIES
+   -------------------------------------------------------------------------- */
+.flex           { display: flex; }
+.flex-col       { flex-direction: column; }
+.flex-wrap      { flex-wrap: wrap; }
+.items-center   { align-items: center; }
+.items-start    { align-items: flex-start; }
+.items-end      { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between{ justify-content: space-between; }
+.justify-end    { justify-content: flex-end; }
+.flex-1         { flex: 1; }
+.flex-shrink-0  { flex-shrink: 0; }
+
+.grid           { display: grid; }
+.w-full         { width: 100%; }
+.h-full         { height: 100%; }
+.min-h-screen   { min-height: 100dvh; }
+.relative       { position: relative; }
+.absolute       { position: absolute; }
+.inset-0        { inset: 0; }
+.overflow-hidden { overflow: hidden; }
+
+/* --------------------------------------------------------------------------
+   6. SURFACE & CARD UTILITIES (Glassmorphic)
+   -------------------------------------------------------------------------- */
+.surface {
+  background: rgba(26, 31, 29, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+.surface-elevated {
+  background: rgba(22, 26, 24, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-inner);
+}
+
+.rounded-sm  { border-radius: var(--radius-sm); }
+.rounded-md  { border-radius: var(--radius-md); }
+.rounded-lg  { border-radius: var(--radius-lg); }
+.rounded-xl  { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full{ border-radius: var(--radius-full); }
+
+/* --------------------------------------------------------------------------
+   7. BADGE UTILITIES
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.badge-success  { background: #1D735B;  color: #ffffff; border: none; }
+.badge-warning  { background: #D4AC6E;  color: #ffffff; border: none; }
+.badge-danger   { background: #B47A6B;  color: #ffffff; border: none; }
+.badge-pending  { background: #D4AC6E;  color: #ffffff; border: none; }
+.badge-brand    { background: rgba(14, 165, 233, 0.1); color: var(--color-brand-500); border: 1px solid rgba(14, 165, 233, 0.2); }
+
+/* --------------------------------------------------------------------------
+   8. BUTTON UTILITIES
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wide);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+  color: #0F1E36;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.1);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #BAE6FD 0%, #7DD3FC 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #0F1E36;
+}
+.btn-ghost:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.6);
+  color: #0F1E36;
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+}
+
+/* --------------------------------------------------------------------------
+   9. ANIMATION KEYFRAMES
+   -------------------------------------------------------------------------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(14, 165, 233, 0.1); }
+  50%       { box-shadow: 0 0 28px rgba(14, 165, 233, 0.3); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes orb-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(8px, -6px) scale(1.03); }
+  66%       { transform: translate(-5px, 6px) scale(0.97); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-out-expo) both;
+}
+.animate-fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-out-expo) both;
+}
+
+/* Staggered animation delays for bento cards */
+.delay-1 { animation-delay: 60ms; }
+.delay-2 { animation-delay: 120ms; }
+.delay-3 { animation-delay: 180ms; }
+.delay-4 { animation-delay: 240ms; }
+.delay-5 { animation-delay: 300ms; }
+.delay-6 { animation-delay: 360ms; }
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-overlay) 25%,
+    var(--color-bg-surface) 50%,
+    var(--color-bg-overlay) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s var(--ease-in-out) infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   10. SCROLLBAR
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg-base); }
+::-webkit-scrollbar-thumb {
+  background: rgba(150, 220, 240, 0.4);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(150, 220, 240, 0.6); }
+
+/* --------------------------------------------------------------------------
+   11. SELECTION
+   -------------------------------------------------------------------------- */
+::selection {
+  background: rgba(14, 165, 233, 0.2);
+  color: #0F1E36;
+}
+
+/* --------------------------------------------------------------------------
+   12. FOCUS RING
+   -------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* EMERGENCY FIX FOR TAILWIND MISSING */
+.pl-10 { padding-left: 2.5rem !important; }
+.pr-4 { padding-right: 1rem !important; }
+.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+.px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
