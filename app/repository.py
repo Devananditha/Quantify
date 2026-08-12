@@ -21,6 +21,13 @@ def fetch_transactions(
     status: str | None = None,
     category: str | None = None,
     user_id: int | None = None,
+    search: str | None = None,
+    min_amount: float | None = None,
+    max_amount: float | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    sort_key: str = "transaction_date",
+    sort_dir: str = "desc",
 ) -> dict[str, Any]:
     """Return a paginated slice of transactions with optional filters."""
     offset = (page - 1) * page_size
@@ -37,8 +44,29 @@ def fetch_transactions(
     if user_id:
         filters.append("user_id = %s")
         params.append(user_id)
+    if search:
+        search_pattern = f"%{search}%"
+        filters.append("(merchant ILIKE %s OR txn_id ILIKE %s OR category ILIKE %s)")
+        params.extend([search_pattern, search_pattern, search_pattern])
+    if min_amount is not None:
+        filters.append("amount >= %s")
+        params.append(min_amount)
+    if max_amount is not None:
+        filters.append("amount <= %s")
+        params.append(max_amount)
+    if start_date:
+        filters.append("transaction_date >= %s")
+        params.append(start_date)
+    if end_date:
+        filters.append("transaction_date <= %s")
+        params.append(f"{end_date} 23:59:59")
 
     where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+    valid_sort_keys = {"transaction_date", "amount", "merchant"}
+    if sort_key not in valid_sort_keys:
+        sort_key = "transaction_date"
+    order_clause = "DESC" if sort_dir.lower() == "desc" else "ASC"
 
     with conn.cursor() as cur:
         # total count
@@ -56,7 +84,7 @@ def fetch_transactions(
                    transaction_date
             FROM   transactions
             {where_clause}
-            ORDER  BY transaction_date DESC
+            ORDER  BY {sort_key} {order_clause}
             LIMIT  %s OFFSET %s
             """,
             [*params, page_size, offset],
@@ -64,6 +92,62 @@ def fetch_transactions(
         rows = cur.fetchall()
 
     return {"total": total, "rows": [dict(r) for r in rows]}
+
+
+def fetch_spend_analytics(
+    conn: pg.connection,
+    *,
+    status: str | None = None,
+    user_id: int | None = None,
+    search: str | None = None,
+    min_amount: float | None = None,
+    max_amount: float | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return aggregated category spend data for analytics, excluding category filter to keep charts populated."""
+    filters: list[str] = []
+    params: list[Any] = []
+
+    if status:
+        filters.append("status = %s")
+        params.append(status.upper())
+    if user_id:
+        filters.append("user_id = %s")
+        params.append(user_id)
+    if search:
+        search_pattern = f"%{search}%"
+        filters.append("(merchant ILIKE %s OR txn_id ILIKE %s OR category ILIKE %s)")
+        params.extend([search_pattern, search_pattern, search_pattern])
+    if min_amount is not None:
+        filters.append("amount >= %s")
+        params.append(min_amount)
+    if max_amount is not None:
+        filters.append("amount <= %s")
+        params.append(max_amount)
+    if start_date:
+        filters.append("transaction_date >= %s")
+        params.append(start_date)
+    if end_date:
+        filters.append("transaction_date <= %s")
+        params.append(f"{end_date} 23:59:59")
+        
+    where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+    with conn.cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT COALESCE(category, 'Uncategorized') AS name, SUM(amount)::FLOAT AS value
+            FROM transactions
+            {where_clause}
+            GROUP BY COALESCE(category, 'Uncategorized')
+            ORDER BY value DESC
+            """,
+            params,
+        )
+        rows = cur.fetchall()
+
+    return [dict(r) for r in rows]
 
 
 # ---------------------------------------------------------------------------

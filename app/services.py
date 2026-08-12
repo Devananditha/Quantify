@@ -85,6 +85,13 @@ def get_transactions(
     status: str | None,
     category: str | None,
     user_id: int | None,
+    search: str | None = None,
+    min_amount: float | None = None,
+    max_amount: float | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    sort_key: str = "transaction_date",
+    sort_dir: str = "desc",
 ) -> PaginatedTransactions:
     with get_db() as conn:
         data = repository.fetch_transactions(
@@ -94,13 +101,42 @@ def get_transactions(
             status=status,
             category=category,
             user_id=user_id,
+            search=search,
+            min_amount=min_amount,
+            max_amount=max_amount,
+            start_date=start_date,
+            end_date=end_date,
+            sort_key=sort_key,
+            sort_dir=sort_dir,
         )
     return PaginatedTransactions(
         total=data["total"],
         page=page,
         page_size=page_size,
-        results=[TransactionOut(**row) for row in data["rows"]],
+        results=[TransactionOut(**r) for r in data["rows"]],
     )
+
+
+def get_spend_analytics(
+    status: str | None = None,
+    user_id: int | None = None,
+    search: str | None = None,
+    min_amount: float | None = None,
+    max_amount: float | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[dict]:
+    with get_db() as conn:
+        return repository.fetch_spend_analytics(
+            conn,
+            status=status,
+            user_id=user_id,
+            search=search,
+            min_amount=min_amount,
+            max_amount=max_amount,
+            start_date=start_date,
+            end_date=end_date,
+        )
 
 
 def get_coin_balance(user_id: int) -> CoinBalance:
