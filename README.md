@@ -49,15 +49,12 @@ A data-heavy financial dashboard for paying credit-card bills, earning reward co
 ## Done / Not-Done / Known Issues
 
 ### Done
-- **Transactions Table**: Renders 10k rows smoothly using purely custom virtualization (no external UI libraries).
-- **Core Filters & Sorts**: Works instantly across all 10k rows loaded in-memory.
+- **Transactions Table**: Robust server-side pagination ensuring rapid load times and low memory usage even for massive datasets.
+- **Core Filters & Sorts**: Dynamic server-side SQL generation supporting comprehensive date, amount, NLP text, and categorical filtering across 10k+ rows.
+- **Two-way Analytics**: Analytics endpoints aggregate data based on the current active table filters, ensuring the charts perfectly mirror the filtered dataset.
 - **Hand-Built Components**: Table, modals, buttons, and layout built from scratch with clean CSS Modules.
 - **Charts**: Category spending donut chart and predictive insights using Recharts.
 - **Rewards Flow**: Optimistic UI updates with a fully validated backend redemption process.
 
-### Not Done
-- Two-way chart-to-table filtering (chart clicking currently filters table, but table filters don't reshape charts).
-- Server-side pagination (chose client-side virtualization as the prompt suggested "full set loaded").
-
 ### Known Issues
-- Currently, filtering relies heavily on client-side JS. This is blazing fast for 10k rows due to virtualization but would need to be migrated to server-side query filters if the dataset grows to millions of rows.
+- The NLP conversational search uses basic substring matching under the hood. For a production environment with complex conversational requests, this could be upgraded to a vector similarity search or an LLM query parser.
