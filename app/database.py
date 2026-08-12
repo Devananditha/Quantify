@@ -30,7 +30,11 @@ def get_pool() -> pool.ThreadedConnectionPool:
     """Initialise pool lazily on first call."""
     global _pool
     if _pool is None:
-        _pool = pool.ThreadedConnectionPool(minconn=1, maxconn=10, **DB_CONFIG)
+        db_url = os.getenv("DATABASE_URL")
+        if db_url:
+            _pool = pool.ThreadedConnectionPool(1, 10, dsn=db_url)
+        else:
+            _pool = pool.ThreadedConnectionPool(1, 10, **DB_CONFIG)
     return _pool
 
 
