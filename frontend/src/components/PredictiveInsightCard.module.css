@@ -1,0 +1,231 @@
+/* ─── Strip shell ──────────────────────────────────────────────────────────── */
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.stripLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.sparkle {
+  color: var(--color-brand-400);
+  font-size: 1.1em;
+}
+
+.modelTag {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(186, 249, 26, 0.1);
+  color: var(--color-brand-400);
+  border: 1px solid rgba(186, 249, 26, 0.25);
+  margin-left: var(--space-2);
+  font-weight: var(--font-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ─── Grid ───────────────────────────────────────────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+/* ─── Card ───────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.card:hover {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+}
+
+.delta {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+.deltaUp {
+  color: #F87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+.deltaDown {
+  color: #34D399;
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.prediction {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+}
+
+.confidence {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-left: 2px;
+}
+
+/* ─── Explainable AI (XAI) Trigger & Popover ─────────────────────────────── */
+.xaiTrigger {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-brand-400);
+  background: rgba(186, 249, 26, 0.08);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(186, 249, 26, 0.2);
+  cursor: help;
+  transition: all var(--duration-fast);
+}
+
+.xaiTrigger:hover,
+.xaiTrigger:focus-visible {
+  background: rgba(186, 249, 26, 0.16);
+  border-color: rgba(186, 249, 26, 0.45);
+  box-shadow: 0 0 12px rgba(186, 249, 26, 0.25);
+}
+
+.xaiIcon {
+  font-size: 1.1em;
+}
+
+/* The Popover itself */
+.xaiPopover {
+  position: absolute;
+  bottom: 120%;
+  right: 0;
+  width: 280px;
+  background: var(--color-bg-overlay);
+  border: 1px solid var(--color-border-focus);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(124, 58, 237, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+  pointer-events: none; /* Don't interfere with hovers when hidden */
+}
+
+/* Show on hover/focus */
+.xaiTrigger:hover .xaiPopover,
+.xaiTrigger:focus-visible .xaiPopover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Popover Content */
+.xaiHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.xaiSparkle {
+  color: var(--color-accent-400);
+}
+
+.xaiText {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-4);
+}
+
+.xaiMeta {
+  display: flex;
+  justify-content: space-between;
+  background: var(--color-bg-base);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.xaiMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-primary);
+}
+
+.xaiMetaLabel {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .xaiTrigger {
+    position: static;
+    margin-top: var(--space-2);
+    align-self: flex-start;
+  }
+  .xaiPopover {
+    right: auto;
+    left: 0;
+    bottom: auto;
+    top: 100%;
+    margin-top: var(--space-2);
+    width: calc(100vw - 2rem);
+  }
+}
