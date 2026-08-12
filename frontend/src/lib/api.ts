@@ -34,6 +34,18 @@ export interface TransactionFilters {
   status?: string;
   category?: string;
   user_id?: number;
+  search?: string;
+  min_amount?: string | number;
+  max_amount?: string | number;
+  start_date?: string;
+  end_date?: string;
+  sort_key?: string;
+  sort_dir?: string;
+}
+
+export interface CategorySpend {
+  name: string;
+  value: number;
 }
 
 export interface CoinBalance {
@@ -95,13 +107,35 @@ export async function getTransactions(
   filters: TransactionFilters = {}
 ): Promise<PaginatedTransactions> {
   const q = buildQuery({
-    page:      filters.page      ?? 1,
-    page_size: filters.page_size ?? 50,
-    status:    filters.status,
-    category:  filters.category,
-    user_id:   filters.user_id,
+    page:       filters.page      ?? 1,
+    page_size:  filters.page_size ?? 50,
+    status:     filters.status,
+    category:   filters.category,
+    user_id:    filters.user_id,
+    search:     filters.search,
+    min_amount: filters.min_amount,
+    max_amount: filters.max_amount,
+    start_date: filters.start_date,
+    end_date:   filters.end_date,
+    sort_key:   filters.sort_key,
+    sort_dir:   filters.sort_dir,
   });
   return apiFetch<PaginatedTransactions>(`/api/transactions${q}`);
+}
+
+export async function getSpendAnalytics(
+  filters: Omit<TransactionFilters, "page" | "page_size" | "sort_key" | "sort_dir" | "category"> = {}
+): Promise<CategorySpend[]> {
+  const q = buildQuery({
+    status:     filters.status,
+    user_id:    filters.user_id,
+    search:     filters.search,
+    min_amount: filters.min_amount,
+    max_amount: filters.max_amount,
+    start_date: filters.start_date,
+    end_date:   filters.end_date,
+  });
+  return apiFetch<CategorySpend[]>(`/api/transactions/analytics${q}`);
 }
 
 /**
