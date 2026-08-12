@@ -1,0 +1,56 @@
+/* Holographic Silver/Blue Mesh Card */
+.card {
+  margin: var(--space-4) var(--space-3) 0;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(150, 220, 240, 0.4);
+  /* The holographic mesh background */
+  background-color: #E2E8F0;
+  background-image:
+    radial-gradient(ellipse at top left, rgba(224, 242, 254, 0.9), transparent 70%),
+    radial-gradient(ellipse at bottom right, rgba(125, 211, 252, 0.6), transparent 70%),
+    radial-gradient(ellipse at bottom left, rgba(15, 30, 54, 0.1), transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(203, 213, 225, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: var(--font-bold);
+  color: #0F1E36;
+  letter-spacing: var(--tracking-wide);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0F1E36;
+}
+
+.collapseBtn {
+  color: #0F1E36;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.collapseBtn:hover {
+  opacity: 1;
+}
