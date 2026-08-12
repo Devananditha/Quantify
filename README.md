@@ -59,3 +59,6 @@ A data-heavy financial dashboard for paying credit-card bills, earning reward co
 ### Known Limitations & Next Steps
 - **Mobile Responsiveness**: Given the time constraints, I prioritized core architectural requirements—including robust server-side pagination for 10,000 rows, API error handling, and a custom data table. The desktop UI is fully polished, but mobile responsiveness (media queries for table overflow and grid stacking) is incomplete and would be my immediate next priority.
 - **Search Capabilities**: The NLP conversational search uses basic substring matching under the hood. For a production environment with complex conversational requests, this could be upgraded to a vector similarity search or an LLM query parser.
+
+## 👨‍💻 About the Developer
+Developed by **Devananditha V**. As a third-year B.Tech undergraduate in Computer Science Engineering at Vellore Institute of Technology, Amaravati, I specialize in full-stack architecture and AI integration. Drawing from my experience building production-ready pipelines and AI-powered interfaces, I engineered Quantify to be fast, strictly typed, and visually polished.
