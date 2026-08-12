@@ -94,8 +94,7 @@ export default async function DashboardPage() {
             right={<Link href="/transactions" className="text-sm text-brand" style={{ color: "var(--color-brand-400)" }}>View all →</Link>}
           />
           <div className={styles.txnTable}>
-            {/* Header row — hidden on mobile */}
-            <div className="hidden sm:grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 pb-3 border-b border-cyan-100/50 text-slate-500 text-sm">
+            <div className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 pb-3 border-b border-cyan-100/50 text-slate-500 text-sm">
               <span>ID</span>
               <span>Merchant</span>
               <span>Category</span>
@@ -105,14 +104,13 @@ export default async function DashboardPage() {
             {recentTxns.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-sm">No recent transactions found</div>
             ) : recentTxns.map((txn) => (
-              <div key={txn.txn_id} className="flex flex-col gap-1 p-3 rounded-md border-b border-cyan-50 sm:grid sm:grid-cols-[140px_1fr_1fr_90px_90px] sm:gap-4 sm:items-center transition-colors hover:bg-cyan-50/50 text-sm">
-                <span className="font-mono text-xs text-slate-400">{txn.txn_id}</span>
-                <div className="flex items-center justify-between sm:block">
-                  <span className="font-semibold text-[#08172c]">{txn.merchant}</span>
-                  <span className="font-digital text-[#08172c] font-bold tabular-nums tracking-tight sm:hidden" style={{ fontVariationSettings: '"ROND" 100, "wght" 700' }}>₹{Math.round(txn.amount).toLocaleString("en-IN")}</span>
-                </div>
-                <span className="text-slate-500 text-xs hidden sm:block">{txn.category}</span>
-                <span className="font-digital text-[#08172c] font-bold text-right tabular-nums tracking-tight hidden sm:block" style={{ fontVariationSettings: '"ROND" 100, "wght" 700' }}>₹{Math.round(txn.amount).toLocaleString("en-IN")}</span>
+              <div key={txn.txn_id} className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 items-center p-3 rounded-md transition-colors hover:bg-cyan-50/50 text-sm">
+                <span className="font-mono text-xs text-slate-500">
+                  {txn.txn_id}
+                </span>
+                <span className="font-semibold text-[#08172c]">{txn.merchant}</span>
+                <span className="text-slate-500 text-xs">{txn.category}</span>
+                <span className="font-digital text-[#08172c] font-bold text-right tabular-nums tracking-tight" style={{ fontVariationSettings: '"ROND" 100, "wght" 700' }}>₹{Math.round(txn.amount).toLocaleString("en-IN")}</span>
                 <span className={statusBadge(txn.status)}>{txn.status}</span>
               </div>
             ))}
