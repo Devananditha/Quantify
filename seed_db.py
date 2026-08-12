@@ -5,14 +5,22 @@ from dateutil import parser
 import psycopg2
 from psycopg2.extras import execute_values
 
+import os
+
 # Database connection parameters
-DB_CONFIG = {
-    "dbname": "postgres",
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",
-    "port": "5432"
-}
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    DB_DSN = db_url
+    DB_CONFIG = None
+else:
+    DB_DSN = None
+    DB_CONFIG = {
+        "dbname": os.getenv("DB_NAME", "postgres"),
+        "user": os.getenv("DB_USER", "postgres"),
+        "password": os.getenv("DB_PASSWORD", "postgres"),
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": os.getenv("DB_PORT", "5432")
+    }
 
 def clean_timestamp(ts):
     """
@@ -110,7 +118,10 @@ def seed_database(json_filepath):
     Parses the JSON dataset, cleans data, generates mock linked data, and bulk inserts into PostgreSQL.
     """
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        if DB_DSN:
+            conn = psycopg2.connect(DB_DSN)
+        else:
+            conn = psycopg2.connect(**DB_CONFIG)
         print("Connected to PostgreSQL successfully.")
         
         setup_schema(conn)
