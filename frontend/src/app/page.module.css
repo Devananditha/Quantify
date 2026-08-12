@@ -1,0 +1,252 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+/* Page header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid rgba(186, 249, 26, 0.08);
+}
+
+.pageTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+}
+
+.pageSub {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-1);
+}
+
+/* ── Transaction table ────────────────────────────────────────────────────── */
+.txnTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.txnHead {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr 90px 90px;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.62rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  border-bottom: 1px solid rgba(186, 249, 26, 0.07);
+}
+
+.txnRow {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr 90px 90px;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast) var(--ease-in-out);
+  font-size: var(--text-sm);
+}
+
+.txnRow:hover {
+  background: rgba(14, 165, 233, 0.05);
+  box-shadow: inset 2px 0 0 var(--color-brand-400);
+}
+
+.alignRight { text-align: right; }
+
+.txnMerchant {
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.txnCategory {
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.txnAmount {
+  font-family: var(--font-digital);
+  font-variation-settings: "ROND" 100, "wght" 500;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: #0F1E36;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* ── Coin Gauge ──────────────────────────────────────────────────────────── */
+.coinGauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  flex: 1;
+  justify-content: center;
+}
+
+.coinRing {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.coinSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.coinInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.coinValue {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  letter-spacing: 0.05em;
+  font-family: var(--font-digital);
+  font-variation-settings: "ROND" 100, "wght" 500;
+  color: #0F1E36;
+}
+
+.coinLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+}
+
+.coinStats {
+  display: flex;
+  gap: var(--space-8);
+  width: 100%;
+  justify-content: center;
+}
+
+.coinStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+/* ── Rewards Grid ────────────────────────────────────────────────────────── */
+.rewardsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-4);
+}
+
+.rewardItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(150, 220, 240, 0.4);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  min-height: 180px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.rewardItem:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(14, 165, 233, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(150, 220, 240, 0.4);
+}
+
+.rewardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.rewardBadge {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65%;
+}
+
+.rewardCoins {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: #0F1E36;
+  font-family: var(--font-digital);
+  font-variation-settings: "ROND" 100, "wght" 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+
+.rewardName {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-snug);
+  flex: 1;
+}
+
+.redeemBtn {
+  margin-top: auto;
+  width: 100%;
+  padding: var(--space-2) 0;
+  background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+  color: #0F1E36;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.redeemBtn:hover {
+  background: linear-gradient(135deg, #BAE6FD 0%, #7DD3FC 100%);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .txnHead, .txnRow {
+    grid-template-columns: 120px 1fr 80px 80px;
+  }
+  .txnCategory { display: none; }
+  .rewardsGrid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .txnHead { display: none; }
+  .txnRow { grid-template-columns: 1fr 80px 80px; }
+  .rewardsGrid { grid-template-columns: repeat(2, 1fr); }
+}
