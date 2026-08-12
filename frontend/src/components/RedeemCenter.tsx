@@ -81,9 +81,14 @@ export function RedeemCenter({ balance, redemptions }: RedeemCenterProps) {
 
         {/* ── Page Header ── */}
         <div className="flex flex-wrap items-start justify-between gap-6 w-full" style={{ marginBottom: '60px' }}>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-[#1e3a8a] font-sans">Redemption Center</h1>
-            <p className="text-sm font-medium text-slate-500 mt-1">Manage your claimed rewards and active vouchers.</p>
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-[#1e3a8a] font-sans">Redemption Center</h1>
+              <p className="text-sm font-medium text-slate-500 mt-1">Manage your claimed rewards and active vouchers.</p>
+            </div>
+            <div className="flex md:hidden items-center justify-center w-10 h-10 rounded-full bg-cyan-100 border border-cyan-200 overflow-hidden cursor-pointer shadow-sm shrink-0">
+              <span className="text-sm font-bold text-[#0F1E36]">U1</span>
+            </div>
           </div>
 
           {/* Balance Glass Card */}

@@ -49,9 +49,14 @@ export function RewardsDashboard({ initialBalance, rewards }: RewardsDashboardPr
 
       {/* ── Page Header ── */}
       <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
-        <div>
-          <h1 className="text-[#08172c] text-4xl font-bold tracking-tight mb-1">Rewards Catalogue</h1>
-          <p className="text-slate-500 text-sm font-medium">Redeem your hard-earned coins for exclusive benefits.</p>
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div>
+            <h1 className="text-[#08172c] text-4xl font-bold tracking-tight mb-1">Rewards Catalogue</h1>
+            <p className="text-slate-500 text-sm font-medium">Redeem your hard-earned coins for exclusive benefits.</p>
+          </div>
+          <div className="flex md:hidden items-center justify-center w-10 h-10 rounded-full bg-cyan-100 border border-cyan-200 overflow-hidden cursor-pointer shadow-sm shrink-0">
+            <span className="text-sm font-bold text-[#0F1E36]">U1</span>
+          </div>
         </div>
 
         {/* Available Balance Glass Pill */}

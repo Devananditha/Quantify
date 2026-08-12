@@ -59,9 +59,14 @@ export default async function DashboardPage() {
     <div className={styles.page}>
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-cyan-100/50">
-        <div>
-          <h1 className={styles.pageTitle}>Welcome back,</h1>
-          <p className={styles.pageSub}>Your financial overview at a glance</p>
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div>
+            <h1 className={styles.pageTitle}>Welcome back,</h1>
+            <p className={styles.pageSub}>Your financial overview at a glance</p>
+          </div>
+          <div className="flex md:hidden items-center justify-center w-10 h-10 rounded-full bg-cyan-100 border border-cyan-200 overflow-hidden cursor-pointer shadow-sm shrink-0">
+            <span className="text-sm font-bold text-[#0F1E36]">U1</span>
+          </div>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <Link href="/rewards" className="w-full sm:w-auto btn btn-sm bg-gradient-to-b from-[#8ce3f5] to-[#4fd1c5] text-[#0F1E36] font-medium shadow-[0_4px_15px_rgba(79,209,197,0.4)] rounded-xl hover:brightness-105 transition-all inline-flex items-center justify-center">
