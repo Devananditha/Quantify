@@ -16,19 +16,13 @@ interface BentoCardProps {
 
 export function BentoCard({
   children,
-  colSpan = 4,
-  rowSpan = 1,
+  colSpan, // Deprecated prop
+  rowSpan, // Deprecated prop
   variant = "default",
   className = "",
   glow = false,
   style,
 }: BentoCardProps) {
-  const cardStyle: React.CSSProperties = {
-    gridColumn: `span ${colSpan}`,
-    gridRow: `span ${rowSpan}`,
-    ...style,
-  };
-
   return (
     <div
       className={[
@@ -43,7 +37,7 @@ export function BentoCard({
       ]
         .filter(Boolean)
         .join(" ")}
-      style={cardStyle}
+      style={style}
     >
       {children}
     </div>

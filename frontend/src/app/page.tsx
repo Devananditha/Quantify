@@ -58,67 +58,71 @@ export default async function DashboardPage() {
   return (
     <div className={styles.page}>
       {/* Page Header */}
-      <header className={styles.pageHeader}>
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-cyan-100/50">
         <div>
           <h1 className={styles.pageTitle}>Welcome back,</h1>
           <p className={styles.pageSub}>Your financial overview at a glance</p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/rewards" className="btn btn-sm bg-gradient-to-b from-[#8ce3f5] to-[#4fd1c5] text-[#0F1E36] font-medium shadow-[0_4px_15px_rgba(79,209,197,0.4)] rounded-xl hover:brightness-105 transition-all inline-flex items-center justify-center">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Link href="/rewards" className="w-full sm:w-auto btn btn-sm bg-gradient-to-b from-[#8ce3f5] to-[#4fd1c5] text-[#0F1E36] font-medium shadow-[0_4px_15px_rgba(79,209,197,0.4)] rounded-xl hover:brightness-105 transition-all inline-flex items-center justify-center">
             Redeem Coins
           </Link>
         </div>
       </header>
 
-      {/* Bento Grid */}
-      <BentoGrid>
+      {/* Main Page Layout */}
+      <div className="flex flex-col gap-6 w-full">
 
         {/* ── Row 1: Four KPI tiles ── */}
-        {STATS.map((stat, i) => (
-          <BentoCard
-            key={stat.label}
-            colSpan={3}
-            variant={i === 1 ? "brand" : "default"}
-            glow={i === 1}
-            className={`delay-${i + 1}`}
-          >
-            <CardHeader label={stat.label} />
-            <CardMetric value={stat.value} unit={stat.unit} sub={stat.sub} />
-          </BentoCard>
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 w-full">
+          {STATS.map((stat, i) => (
+            <BentoCard
+              key={stat.label}
+              variant={i === 1 ? "brand" : "default"}
+              glow={i === 1}
+              className={`delay-${i + 1}`}
+            >
+              <CardHeader label={stat.label} />
+              <CardMetric value={stat.value} unit={stat.unit} sub={stat.sub} />
+            </BentoCard>
+          ))}
+        </div>
 
-        {/* ── Row 2: Recent transactions (wide) + Coin gauge ── */}
-        <BentoCard colSpan={8} rowSpan={2} variant="default" className="delay-1">
+        {/* ── Row 2: Recent transactions + Coin gauge ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+          <BentoCard variant="default" className="lg:col-span-2 delay-1">
           <CardHeader
             label="Recent Transactions"
             right={<Link href="/transactions" className="text-sm text-brand" style={{ color: "var(--color-brand-400)" }}>View all →</Link>}
           />
-          <div className={styles.txnTable}>
-            <div className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 pb-3 border-b border-cyan-100/50 text-slate-500 text-sm">
-              <span>ID</span>
-              <span>Merchant</span>
-              <span>Category</span>
-              <span className="text-right">Amount</span>
-              <span>Status</span>
-            </div>
-            {recentTxns.length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-sm">No recent transactions found</div>
-            ) : recentTxns.map((txn) => (
-              <div key={txn.txn_id} className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 items-center p-3 rounded-md transition-colors hover:bg-cyan-50/50 text-sm">
-                <span className="font-mono text-xs text-slate-500">
-                  {txn.txn_id}
-                </span>
-                <span className="font-semibold text-[#08172c]">{txn.merchant}</span>
-                <span className="text-slate-500 text-xs">{txn.category}</span>
-                <span className="font-digital text-[#08172c] font-bold text-right tabular-nums tracking-tight" style={{ fontVariationSettings: '"ROND" 100, "wght" 700' }}>₹{Math.round(txn.amount).toLocaleString("en-IN")}</span>
-                <span className={statusBadge(txn.status)}>{txn.status}</span>
+          <div className="w-full overflow-x-auto overflow-y-hidden rounded-xl">
+            <div className={`${styles.txnTable} min-w-[800px]`}>
+              <div className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 pb-3 border-b border-cyan-100/50 text-slate-500 text-sm">
+                <span>ID</span>
+                <span>Merchant</span>
+                <span>Category</span>
+                <span className="text-right">Amount</span>
+                <span>Status</span>
               </div>
-            ))}
+              {recentTxns.length === 0 ? (
+                <div className="py-8 text-center text-slate-400 text-sm">No recent transactions found</div>
+              ) : recentTxns.map((txn) => (
+                <div key={txn.txn_id} className="grid grid-cols-[140px_1fr_1fr_90px_90px] gap-4 items-center p-3 rounded-md transition-colors hover:bg-cyan-50/50 text-sm">
+                  <span className="font-mono text-xs text-slate-500">
+                    {txn.txn_id}
+                  </span>
+                  <span className="font-semibold text-[#08172c]">{txn.merchant}</span>
+                  <span className="text-slate-500 text-xs">{txn.category}</span>
+                  <span className="font-digital text-[#08172c] font-bold text-right tabular-nums tracking-tight" style={{ fontVariationSettings: '"ROND" 100, "wght" 700' }}>₹{Math.round(txn.amount).toLocaleString("en-IN")}</span>
+                  <span className={statusBadge(txn.status)}>{txn.status}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </BentoCard>
 
         {/* Coin Balance Gauge */}
-        <BentoCard colSpan={4} rowSpan={2} variant="brand" glow className="delay-2">
+        <BentoCard variant="brand" glow className="lg:col-span-1 delay-2">
           <CardHeader label="Coin Balance" />
           <div className={styles.coinGauge}>
             <div className={styles.coinRing}>
@@ -156,13 +160,15 @@ export default async function DashboardPage() {
           </div>
         </BentoCard>
 
+        </div>
+
         {/* ── Row 3: Rewards Catalogue ── */}
-        <BentoCard colSpan={12} className="!bg-transparent !backdrop-blur-none !border-transparent !shadow-none !p-0 delay-3">
+        <BentoCard className="!bg-transparent !backdrop-blur-none !border-transparent !shadow-none !p-0 delay-3 w-full">
           <CardHeader
             label="Rewards Catalogue"
             right={<Link href="/rewards" className="btn btn-ghost btn-sm inline-flex items-center justify-center">Browse all</Link>}
           />
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 w-full">
             {rewards.length === 0 ? (
               <div className="col-span-6 py-8 text-center text-slate-400 text-sm">No rewards available</div>
             ) : rewards.map((reward) => (
@@ -184,8 +190,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         </BentoCard>
-
-      </BentoGrid>
+      </div>
     </div>
   );
 }

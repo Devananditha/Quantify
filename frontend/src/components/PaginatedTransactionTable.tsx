@@ -181,7 +181,7 @@ export function PaginatedTransactionTable() {
       {/* ── Analytics & Categories Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Trend Line */}
-        <div className="col-span-2 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6">
           <SpendAnalytics 
             data={analyticsData} 
             activeCategory={category} 
@@ -190,7 +190,7 @@ export function PaginatedTransactionTable() {
         </div>
         
         {/* Category Donut */}
-        <div className="col-span-1 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6 flex flex-col">
+        <div className="lg:col-span-1 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6 flex flex-col">
           <CategoryDonutChart 
             data={analyticsData} 
             activeCategory={category} 
@@ -202,10 +202,10 @@ export function PaginatedTransactionTable() {
       <AnimatedTopMerchants />
 
       {/* ── Filter bar ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-4 w-full mb-6" role="search" aria-label="Filter transactions">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-4 w-full mb-6" role="search" aria-label="Filter transactions">
 
         {/* 1. SEARCH BAR */}
-        <div className="relative w-full xl:w-[320px] shrink-0">
+        <div className="relative w-full lg:w-auto flex-1 shrink-0">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
@@ -343,11 +343,11 @@ export function PaginatedTransactionTable() {
         )}
 
         <div
-          className="overflow-x-auto overflow-y-auto max-h-[600px]"
+          className="overflow-x-auto overflow-y-auto max-h-[600px] w-full"
           role="region"
           aria-label="Transactions — paginated list"
         >
-          <table className="w-full text-left border-collapse tabular-nums">
+          <table className="w-full min-w-[800px] text-left border-collapse tabular-nums">
             <caption className={styles.srOnly}>
               {totalRows.toLocaleString()} transactions
             </caption>

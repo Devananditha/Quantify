@@ -27,7 +27,7 @@ export default function TransactionsPage() {
   return (
     <FilterProvider>
       <div className="flex flex-col gap-6 w-full">
-        <header className={styles.header}>
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-cyan-100/50">
           <div>
             <h1 className={styles.title}>Transactions</h1>
             <p className={styles.sub}>

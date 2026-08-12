@@ -61,14 +61,14 @@ export default function RootLayout({
         <div className={styles.shell}>
           <Sidebar />
           <main 
-            className="min-h-screen flex-1 py-8 pr-8 pl-[100px] lg:pr-[100px] max-sm:py-4 max-sm:px-4 max-sm:pb-24 overflow-x-hidden flex justify-center"
+            className="w-full max-w-[100vw] overflow-x-hidden relative min-h-screen flex-1 py-8 pr-8 pl-[100px] lg:pr-[100px] max-sm:py-4 max-sm:px-4 max-sm:pb-24 flex justify-center"
             style={{
               backgroundColor: "#f0fbff",
               backgroundImage: "radial-gradient(circle at 0% 0%, rgba(132, 230, 248, 0.4) 0%, transparent 40%), radial-gradient(circle at 80% 10%, rgba(132, 230, 248, 0.3) 0%, transparent 40%), radial-gradient(circle at 100% 60%, rgba(132, 230, 248, 0.4) 0%, transparent 50%), radial-gradient(#94a3b8 1px, transparent 1px)",
               backgroundSize: "100% 100%, 100% 100%, 100% 100%, 24px 24px"
             }}
           >
-            <div className="w-full max-w-[1400px]">
+            <div className="w-full max-w-7xl mx-auto overflow-x-hidden">
               {children}
             </div>
           </main>
