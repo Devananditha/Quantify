@@ -1,47 +1,26 @@
 "use client";
 
-/**
- * VirtualTransactionTable
- * ========================
- * Loads all 10,000 rows once into JS memory.
- * Uses the `useVirtual` hook (spacer-row technique) so only the visible
- * slice is in the DOM — typically 15-25 rows at any time.
- *
- * Semantic HTML is fully preserved:
- *   <table> → <thead> (sticky) → <tbody> (spacers + rows) → <tfoot>
- *
- * Fixed row height: ROW_HEIGHT = 60px (must match CSS .tr height)
- */
-
 import {
   useCallback,
-  useDeferredValue,
-  useMemo,
   useState,
   useEffect,
   useRef,
+  memo,
 } from "react";
-import type { Transaction } from "@/lib/api";
+import type { Transaction, CategorySpend } from "@/lib/api";
+import { getTransactions, getSpendAnalytics } from "@/lib/api";
 import { formatINR, formatDate, statusClass, methodIcon } from "@/lib/utils";
-import { useVirtual } from "@/hooks/useVirtual";
 import { SpendAnalytics } from "./SpendAnalytics";
 import { CategoryDonutChart } from "./CategoryDonutChart";
 import { PredictiveInsightCard } from "./PredictiveInsightCard";
 import { Modal } from "./Modal";
 import { useFilter } from "@/context/FilterContext";
-import styles from "./VirtualTransactionTable.module.css";
+import styles from "./PaginatedTransactionTable.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-/** Must match CSS .tr height exactly */
-const ROW_HEIGHT = 60;
-/** Extra rows rendered above + below the visible window */
-const OVERSCAN   = 10;
-
-// ─── Column definitions ───────────────────────────────────────────────────────
-
 interface Column {
-  key: keyof Transaction | "actions";
+  key: string;
   label: string;
   width: string;
   sortable: boolean;
@@ -49,7 +28,7 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { key: "txn_id",           label: "Transaction ID", width: "160px", sortable: false },
+  { key: "txn_id",           label: "Transaction ID", width: "160px", sortable: true },
   { key: "transaction_date", label: "Date & Time",    width: "140px", sortable: true  },
   { key: "merchant",         label: "Merchant",       width: "auto",  sortable: true  },
   { key: "category",         label: "Category",       width: "140px", sortable: true  },
@@ -58,117 +37,99 @@ const COLUMNS: Column[] = [
   { key: "status",           label: "Status",         width: "110px", sortable: false },
 ];
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+export function PaginatedTransactionTable() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [analyticsData, setAnalyticsData] = useState<CategorySpend[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-interface Props {
-  /** All 10,000 rows — already fetched and held in memory */
-  allRows: Transaction[];
-}
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export function VirtualTransactionTable({ allRows }: Props) {
-  // ── Filter state ──────────────────────────────────────────────────────────
+  // Filter state
   const [search,    setSearch]    = useState("");
   const [status,    setStatus]    = useState("");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate,   setEndDate]   = useState("");
-  const [sortKey,   setSortKey]   = useState<keyof Transaction>("transaction_date");
-  const [sortDir,   setSortDir]   = useState<"asc" | "desc">("desc");
+  const [sortKey,   setSortKey]   = useState("transaction_date");
+  const [sortDir,   setSortDir]   = useState("desc");
 
-  // ── Global cross-filter state (shared with SpendAnalytics chart) ──────────
+  // Global cross-filter state (shared with SpendAnalytics chart)
   const { selectedCategory, setCategory, clearCategory } = useFilter();
-  // Alias for readability in filter logic
   const category = selectedCategory ?? "";
 
   // Modal state
   const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(null);
 
-  // Defer search so keystrokes stay snappy even with 10k rows
-  const deferredSearch = useDeferredValue(search);
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on search change
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
 
-  // ── Base filtered dataset (everything EXCEPT category) ──
-  const chartRows = useMemo(() => {
-    let rows = allRows;
+  // Fetch Transactions and Analytics
+  useEffect(() => {
+    let active = true;
+    setIsLoading(true);
 
-    if (status) rows = rows.filter((r) => r.status === status);
-    if (deferredSearch.trim()) {
-      const q = deferredSearch.toLowerCase();
-      rows = rows.filter(
-        (r) =>
-          r.merchant.toLowerCase().includes(q) ||
-          r.txn_id.toLowerCase().includes(q) ||
-          r.category.toLowerCase().includes(q)
-      );
+    async function loadData() {
+      try {
+        const [txnRes, analyticsRes] = await Promise.all([
+          getTransactions({
+            page,
+            page_size: pageSize,
+            status: status || undefined,
+            category: category || undefined,
+            search: debouncedSearch || undefined,
+            min_amount: minAmount || undefined,
+            max_amount: maxAmount || undefined,
+            start_date: startDate || undefined,
+            end_date: endDate || undefined,
+            sort_key: sortKey,
+            sort_dir: sortDir,
+          }),
+          getSpendAnalytics({
+            status: status || undefined,
+            search: debouncedSearch || undefined,
+            min_amount: minAmount || undefined,
+            max_amount: maxAmount || undefined,
+            start_date: startDate || undefined,
+            end_date: endDate || undefined,
+          })
+        ]);
+        if (active) {
+          setTransactions(txnRes.results || []);
+          setTotalRows(txnRes.total || 0);
+          setAnalyticsData(analyticsRes || []);
+          setIsLoading(false);
+        }
+      } catch (e) {
+        console.error(e);
+        if (active) setIsLoading(false);
+      }
     }
-    if (startDate) rows = rows.filter((r) => r.transaction_date.slice(0, 10) >= startDate);
-    if (endDate) rows = rows.filter((r) => r.transaction_date.slice(0, 10) <= endDate);
-    if (minAmount) {
-      const min = parseFloat(minAmount);
-      if (!isNaN(min)) rows = rows.filter((r) => r.amount >= min);
-    }
-    if (maxAmount) {
-      const max = parseFloat(maxAmount);
-      if (!isNaN(max)) rows = rows.filter((r) => r.amount <= max);
-    }
-    // Sort
-    const dir = sortDir === "asc" ? 1 : -1;
-    return [...rows].sort((a, b) => {
-      const av = a[sortKey as keyof Transaction];
-      const bv = b[sortKey as keyof Transaction];
-      if (av == null || bv == null) return 0;
-      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
-      return dir === 1 ? cmp : -cmp;
-    });
-  }, [allRows, status, minAmount, maxAmount, startDate, endDate, deferredSearch, sortKey, sortDir]);
+    loadData();
+    return () => { active = false; };
+  }, [page, status, category, debouncedSearch, minAmount, maxAmount, startDate, endDate, sortKey, sortDir]);
 
-  // ── Category Spend Aggregation (powers the donut chart) ──
-  const categorySpendData = useMemo(() => {
-    const spendMap = new Map<string, number>();
-    for (const r of chartRows) {
-      const current = spendMap.get(r.category) || 0;
-      spendMap.set(r.category, current + r.amount);
-    }
-    return Array.from(spendMap.entries()).map(([name, value]) => ({ name, value }));
-  }, [chartRows]);
-
-  // ── Derived: Final table dataset (includes category filter) ──
-  const processed = useMemo(() => {
-    let rows = chartRows;
-    if (category) {
-      rows = rows.filter((r) => r.category === category);
-    }
-    return rows;
-  }, [chartRows, category]);
-
-  // ── Aggregates ────────────────────────────────────────────────────────────
-  const totalAmount = useMemo(
-    () => processed.reduce((s, r) => s + r.amount, 0),
-    [processed]
-  );
-
-  // ── Categories list (for dropdown) ───────────────────────────────────────
-  const categories = useMemo(
-    () => Array.from(new Set(allRows.map((r) => r.category))).sort(),
-    [allRows]
-  );
-
-  // ── Virtual scroll ────────────────────────────────────────────────────────
-  const { containerRef, onScroll, virtualItems, topPad, bottomPad } =
-    useVirtual({ count: processed.length, rowHeight: ROW_HEIGHT, overscan: OVERSCAN });
-
-  // ── Sort handler ──────────────────────────────────────────────────────────
+  // Sort handler
   const handleSort = useCallback(
-    (key: keyof Transaction) => {
+    (key: string) => {
       setSortDir((d) => (sortKey === key ? (d === "asc" ? "desc" : "asc") : "desc"));
       setSortKey(key);
+      setPage(1);
     },
     [sortKey]
   );
 
-  // ── NLP Conversational Query Parser ───────────────────────────────────────
+  // NLP Conversational Query Parser
   const handleSearchChange = (val: string) => {
     setSearch(val);
     const lower = val.toLowerCase();
@@ -197,9 +158,18 @@ export function VirtualTransactionTable({ allRows }: Props) {
     setMaxAmount("");
     setStartDate("");
     setEndDate("");
+    setPage(1);
   }, [clearCategory]);
 
-  // ─────────────────────────────────────────────────────────────────────────
+  const totalAmount = analyticsData.reduce((sum, item) => sum + item.value, 0);
+  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+
+  // Hardcoded categories list since we removed `allRows`
+  const categories = [
+    "Entertainment", "Food & Dining", "Groceries", 
+    "Health", "Insurance", "Shopping", "Travel", "Utilities"
+  ];
+
   return (
     <div className={styles.wrapper}>
 
@@ -213,18 +183,18 @@ export function VirtualTransactionTable({ allRows }: Props) {
         {/* Trend Line */}
         <div className="col-span-2 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6">
           <SpendAnalytics 
-            data={categorySpendData} 
+            data={analyticsData} 
             activeCategory={category} 
-            onCategoryClick={(c) => setCategory(c === category ? null : c)} 
+            onCategoryClick={(c) => { setCategory(c === category ? null : c); setPage(1); }} 
           />
         </div>
         
         {/* Category Donut */}
         <div className="col-span-1 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-6 flex flex-col">
           <CategoryDonutChart 
-            data={categorySpendData} 
+            data={analyticsData} 
             activeCategory={category} 
-            onCategoryClick={(c) => setCategory(c === category ? null : c)} 
+            onCategoryClick={(c) => { setCategory(c === category ? null : c); setPage(1); }} 
           />
         </div>
       </div>
@@ -234,12 +204,11 @@ export function VirtualTransactionTable({ allRows }: Props) {
       {/* ── Filter bar ─────────────────────────────────────────────────── */}
       <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl p-4 w-full mb-6" role="search" aria-label="Filter transactions">
 
-        {/* 1. SEARCH BAR (Strict Icon Positioning) */}
+        {/* 1. SEARCH BAR */}
         <div className="relative w-full xl:w-[320px] shrink-0">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-          {/* CRITICAL: pl-10 MUST be on the input element itself */}
           <input 
             type="text" 
             placeholder="Ask your financial data..." 
@@ -249,7 +218,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
           />
         </div>
 
-        {/* 2. CENTER FILTERS (Wrap gracefully) */}
+        {/* 2. CENTER FILTERS */}
         <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto flex-1">
           
           <label className={styles.srOnly} htmlFor="v-status">Status</label>
@@ -257,7 +226,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
             id="v-status"
             className="px-4 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-sm appearance-none cursor-pointer min-w-[130px]"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => { setStatus(e.target.value); setPage(1); }}
           >
             <option value="">All Statuses</option>
             <option value="SUCCESS">✅ Success</option>
@@ -270,7 +239,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
             id="v-category"
             className="px-4 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-sm appearance-none cursor-pointer min-w-[130px]"
             value={category}
-            onChange={(e) => setCategory(e.target.value || null)}
+            onChange={(e) => { setCategory(e.target.value || null); setPage(1); }}
           >
             <option value="">All Categories</option>
             {categories.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -284,7 +253,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
               type="date"
               className="w-[130px] px-3 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none shadow-sm"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
               title="Start Date"
             />
             <span className="text-sm font-medium text-slate-500">to</span>
@@ -294,7 +263,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
               type="date"
               className="w-[130px] px-3 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none shadow-sm"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
               title="End Date"
             />
           </div>
@@ -308,7 +277,7 @@ export function VirtualTransactionTable({ allRows }: Props) {
               className="w-[100px] px-3 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none shadow-sm"
               placeholder="Min ₹"
               value={minAmount}
-              onChange={(e) => setMinAmount(e.target.value)}
+              onChange={(e) => { setMinAmount(e.target.value); setPage(1); }}
               min="0"
             />
             <span className="text-sm font-medium text-slate-500">-</span>
@@ -319,17 +288,17 @@ export function VirtualTransactionTable({ allRows }: Props) {
               className="w-[100px] px-3 py-2 bg-white/60 border border-cyan-100 text-[#0F1E36] text-sm rounded-xl focus:outline-none shadow-sm"
               placeholder="Max ₹"
               value={maxAmount}
-              onChange={(e) => setMaxAmount(e.target.value)}
+              onChange={(e) => { setMaxAmount(e.target.value); setPage(1); }}
               min="0"
             />
           </div>
         </div>
 
-        {/* 3. ROW COUNTER (Strict Right Alignment) */}
+        {/* 3. ROW COUNTER */}
         <div className="flex flex-col items-end xl:border-l border-cyan-200 xl:pl-4 shrink-0 mt-2 xl:mt-0 w-full xl:w-auto text-right" aria-live="polite">
-          <span className="text-2xl font-bold text-[#0F1E36] leading-none tracking-tight">{processed.length.toLocaleString()}</span>
+          <span className="text-2xl font-bold text-[#0F1E36] leading-none tracking-tight">{totalRows.toLocaleString()}</span>
           <span className="text-xs font-medium text-slate-500 mt-1">
-            {processed.length === allRows.length ? "rows" : `of ${allRows.length.toLocaleString()}`}
+            rows matched
           </span>
         </div>
       </div>
@@ -338,14 +307,14 @@ export function VirtualTransactionTable({ allRows }: Props) {
       <div className={styles.metricsStrip}>
         <MetricChip
           icon="⬡"
-          label="Rendered"
-          value={`${virtualItems.length} DOM nodes`}
+          label="Server-Side"
+          value="Paginated"
           accent="brand"
         />
         <MetricChip
           icon="📊"
-          label="In memory"
-          value={`${allRows.length.toLocaleString()} rows`}
+          label="Rows Found"
+          value={`${totalRows.toLocaleString()}`}
           accent="neutral"
         />
         <MetricChip
@@ -354,18 +323,10 @@ export function VirtualTransactionTable({ allRows }: Props) {
           value={formatINR(totalAmount)}
           accent="success"
         />
-        {(status || category || deferredSearch || startDate || endDate || minAmount || maxAmount) && (
+        {(status || category || debouncedSearch || startDate || endDate || minAmount || maxAmount) && (
           <button
             className={styles.clearFilters}
-            onClick={() => {
-              setStatus("");
-              clearCategory();
-              setSearch("");
-              setStartDate("");
-              setEndDate("");
-              setMinAmount("");
-              setMaxAmount("");
-            }}
+            onClick={clearFilters}
           >
             Clear all filters ✕
           </button>
@@ -373,124 +334,109 @@ export function VirtualTransactionTable({ allRows }: Props) {
       </div>
 
       {/* ── DATA TABLE MASTER CONTAINER ── */}
-      <div className="flex flex-col bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl overflow-hidden mt-6">
-        {/* ── Scroll container — virtual window lives inside ─────────────── */}
+      <div className="flex flex-col bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(34,211,238,0.15)] rounded-2xl overflow-hidden mt-6 relative min-h-[400px]">
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px] z-20 flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+
         <div
-          ref={containerRef}
           className="overflow-x-auto overflow-y-auto max-h-[600px]"
-          onScroll={onScroll}
           role="region"
-          aria-label="Transactions — virtualized list"
+          aria-label="Transactions — paginated list"
         >
           <table className="w-full text-left border-collapse tabular-nums">
-          <caption className={styles.srOnly}>
-            {processed.length.toLocaleString()} transactions
-            {status   ? `, status: ${status}`     : ""}
-            {category ? `, category: ${category}` : ""}
-          </caption>
+            <caption className={styles.srOnly}>
+              {totalRows.toLocaleString()} transactions
+            </caption>
 
-          {/* Column widths */}
-          <colgroup>
-            {COLUMNS.map((c) => (
-              <col key={c.key} style={{ width: c.width === "auto" ? undefined : c.width }} />
-            ))}
-          </colgroup>
-
-          {/* Sticky header — sticks to top of .scrollContainer */}
-          <thead className="sticky top-0 z-10 bg-[#e0f7fa]/90 backdrop-blur-md border-b border-cyan-200 text-xs font-bold text-[#0F1E36] uppercase tracking-wider">
-            <tr>
-              {COLUMNS.map((col) => (
-                <th
-                  key={col.key}
-                  scope="col"
-                  className={`px-6 py-4 whitespace-nowrap text-xs font-bold text-[#0F1E36] uppercase tracking-wider ${col.align === "right" ? "text-right" : "text-left"}`}
-                  aria-sort={
-                    col.sortable
-                      ? sortKey === col.key
-                        ? sortDir === "asc" ? "ascending" : "descending"
-                        : "none"
-                      : undefined
-                  }
-                >
-                  {col.sortable ? (
-                    <button
-                      className={styles.sortBtn}
-                      onClick={() => handleSort(col.key as keyof Transaction)}
-                      aria-label={`Sort by ${col.label}`}
-                    >
-                      {col.label}
-                      <SortIcon active={sortKey === col.key} dir={sortDir} />
-                    </button>
-                  ) : (
-                    col.label
-                  )}
-                </th>
+            {/* Column widths */}
+            <colgroup>
+              {COLUMNS.map((c) => (
+                <col key={c.key} style={{ width: c.width === "auto" ? undefined : c.width }} />
               ))}
-            </tr>
-          </thead>
+            </colgroup>
 
-          {/* Virtualized body */}
-          <tbody className={styles.tbody}>
-
-            {/* ── Top spacer — compensates for rows above viewport ─── */}
-            {topPad > 0 && (
-              <tr aria-hidden="true" style={{ height: topPad }}>
-                <td colSpan={COLUMNS.length} style={{ padding: 0, border: 0 }} />
-              </tr>
-            )}
-
-            {/* ── Visible rows (only OVERSCAN + viewport rows in DOM) ─ */}
-            {processed.length === 0 ? (
+            {/* Sticky header */}
+            <thead className="sticky top-0 z-10 bg-[#e0f7fa]/90 backdrop-blur-md border-b border-cyan-200 text-xs font-bold text-[#0F1E36] uppercase tracking-wider">
               <tr>
-                <td colSpan={COLUMNS.length} className={styles.emptyCell}>
-                  <EmptyState onClear={clearFilters} />
-                </td>
+                {COLUMNS.map((col) => (
+                  <th
+                    key={col.key}
+                    scope="col"
+                    className={`px-6 py-4 whitespace-nowrap text-xs font-bold text-[#0F1E36] uppercase tracking-wider ${col.align === "right" ? "text-right" : "text-left"}`}
+                    aria-sort={
+                      col.sortable
+                        ? sortKey === col.key
+                          ? sortDir === "asc" ? "ascending" : "descending"
+                          : "none"
+                        : undefined
+                    }
+                  >
+                    {col.sortable ? (
+                      <button
+                        className={styles.sortBtn}
+                        onClick={() => handleSort(col.key)}
+                        aria-label={`Sort by ${col.label}`}
+                      >
+                        {col.label}
+                        <SortIcon active={sortKey === col.key} dir={sortDir as "asc" | "desc"} />
+                      </button>
+                    ) : (
+                      col.label
+                    )}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              virtualItems.map(({ index }) => (
-                <VirtualRow 
-                  key={processed[index].txn_id} 
-                  txn={processed[index]} 
-                  onClick={() => setSelectedTxn(processed[index])} 
-                />
-              ))
-            )}
+            </thead>
 
-            {/* ── Bottom spacer — compensates for rows below viewport ─ */}
-            {bottomPad > 0 && (
-              <tr aria-hidden="true" style={{ height: bottomPad }}>
-                <td colSpan={COLUMNS.length} style={{ padding: 0, border: 0 }} />
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            {/* Body */}
+            <tbody className={styles.tbody}>
+              {!isLoading && transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={COLUMNS.length} className={styles.emptyCell}>
+                    <EmptyState onClear={clearFilters} />
+                  </td>
+                </tr>
+              ) : (
+                transactions.map((txn) => (
+                  <DataRow 
+                    key={txn.txn_id} 
+                    txn={txn} 
+                    onClick={() => setSelectedTxn(txn)} 
+                  />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      {/* ── TABLE FOOTER (Outside scroll container to prevent overlap) ── */}
-      {processed.length > 0 && (
-        <div className="bg-[#e0f7fa]/80 backdrop-blur-md border-t border-cyan-200 p-4 flex justify-between items-center">
+        {/* ── TABLE FOOTER (Pagination Controls) ── */}
+        <div className="bg-[#e0f7fa]/80 backdrop-blur-md border-t border-cyan-200 p-4 flex justify-between items-center z-10 relative">
           <div className="text-xs font-bold text-[#0F1E36] tracking-wider uppercase">
-            Total — {processed.length.toLocaleString()} transactions ({formatINR(totalAmount)})
+            Page {page} of {totalPages}
           </div>
           <div className="flex items-center gap-4">
-            <PositionBar virtualItems={virtualItems} total={processed.length} />
             <div className="flex gap-2">
               <button 
-                onClick={() => containerRef.current?.scrollBy({ top: -600, behavior: 'smooth' })}
-                className="px-3 py-1.5 rounded-lg bg-white/60 border border-cyan-100 hover:bg-cyan-100/50 text-sm font-medium transition-colors text-[#0F1E36]"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 rounded-lg bg-white border border-cyan-200 hover:bg-cyan-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold text-[#0F1E36] transition-colors"
               >
-                Prev
+                Previous
               </button>
               <button 
-                onClick={() => containerRef.current?.scrollBy({ top: 600, behavior: 'smooth' })}
-                className="px-3 py-1.5 rounded-lg bg-white/60 border border-cyan-100 hover:bg-cyan-100/50 text-sm font-medium transition-colors text-[#0F1E36]"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || totalPages === 0}
+                className="px-4 py-2 rounded-lg bg-white border border-cyan-200 hover:bg-cyan-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold text-[#0F1E36] transition-colors"
               >
                 Next
               </button>
             </div>
           </div>
         </div>
-      )}
       </div>
 
       {/* Transaction Details Modal */}
@@ -543,13 +489,11 @@ export function VirtualTransactionTable({ allRows }: Props) {
 
 // ─── Row component (memoised — only re-renders when its txn changes) ──────────
 
-import { memo } from "react";
-
-const VirtualRow = memo(function VirtualRow({ txn, onClick }: { txn: Transaction, onClick: () => void }) {
+const DataRow = memo(function DataRow({ txn, onClick }: { txn: Transaction, onClick: () => void }) {
   const { date, time } = formatDate(txn.transaction_date);
   return (
     <tr 
-      className="border-b border-white/40 last:border-none hover:bg-white/60 transition-colors cursor-pointer group"
+      className="border-b border-white/40 last:border-none hover:bg-white/60 transition-colors cursor-pointer group h-[60px]"
       tabIndex={0} 
       data-status={txn.status}
       onClick={onClick}
@@ -637,33 +581,6 @@ function MetricChip({
   );
 }
 
-// ─── Scroll position bar ──────────────────────────────────────────────────────
-
-function PositionBar({
-  virtualItems, total,
-}: {
-  virtualItems: { index: number; start: number }[];
-  total: number;
-}) {
-  if (total === 0) return null;
-  const firstVisible = virtualItems[0]?.index ?? 0;
-  const lastVisible  = virtualItems[virtualItems.length - 1]?.index ?? 0;
-  const pct = total > 0 ? Math.round(((firstVisible + lastVisible) / 2 / total) * 100) : 0;
-
-  return (
-    <div className={styles.posBar} aria-live="polite" aria-atomic="true">
-      <div className={styles.posTrack}>
-        <div className={styles.posThumb} style={{ width: `${Math.max(4, (lastVisible - firstVisible + 1) / total * 100)}%`, left: `${pct}%` }} />
-      </div>
-      <span className={styles.posLabel}>
-        Rows {(firstVisible + 1).toLocaleString()}–{(lastVisible + 1).toLocaleString()} of {total.toLocaleString()}
-      </span>
-    </div>
-  );
-}
-
-// ─── Animated Top Merchants Component ───────────────────────────────────────
-
 // ─── Animated Top Merchants Component (Vertical Marquee) ─────────────────────
 
 function AnimatedTopMerchants() {
@@ -734,4 +651,3 @@ function AnimatedTopMerchants() {
     </div>
   );
 }
-

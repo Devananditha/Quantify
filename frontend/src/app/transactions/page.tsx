@@ -1,13 +1,12 @@
 import { Suspense } from "react";
-import { getAllTransactions } from "@/lib/api";
-import { VirtualTransactionTable } from "@/components/VirtualTransactionTable";
+import { PaginatedTransactionTable } from "@/components/PaginatedTransactionTable";
 import { FilterProvider } from "@/context/FilterContext";
 import styles from "./page.module.css";
 
 export const metadata = {
   title: "Transactions — Dash",
   description:
-    "Browse and filter all 10,000 transactions with client-side virtualization — only visible rows are rendered.",
+    "Browse and filter transactions using server-side pagination.",
 };
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
@@ -22,13 +21,6 @@ function TableSkeleton() {
   );
 }
 
-// ─── Server component — fetches all 10k rows once ─────────────────────────────
-
-async function VirtualTableLoader() {
-  const allRows = await getAllTransactions();
-  return <VirtualTransactionTable allRows={allRows} />;
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TransactionsPage() {
@@ -39,15 +31,15 @@ export default function TransactionsPage() {
           <div>
             <h1 className={styles.title}>Transactions</h1>
             <p className={styles.sub}>
-              All{" "}
-              <strong style={{ color: "var(--color-brand-400)" }}>10,000 rows</strong>
-              {" "} loaded in memory — filter &amp; sort instantly, zero pagination
+              Browse all records with {" "}
+              <strong style={{ color: "var(--color-brand-400)" }}>server-side pagination</strong>
+              {" "} and filtering.
             </p>
           </div>
         </header>
 
         <Suspense fallback={<TableSkeleton />}>
-          <VirtualTableLoader />
+          <PaginatedTransactionTable />
         </Suspense>
       </div>
     </FilterProvider>
