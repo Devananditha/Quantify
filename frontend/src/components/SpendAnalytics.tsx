@@ -122,11 +122,11 @@ export function SpendAnalytics({ data, activeCategory, onCategoryClick }: SpendA
         </p>
       </div>
 
-      <div className={styles.chartContainer}>
+      <div className="w-full h-[250px] sm:h-[300px] mt-4 mb-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={monthlyData}
-            margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             {/* ── SVG Gradient Definition ─────────────────────────────────── */}
             <defs>
